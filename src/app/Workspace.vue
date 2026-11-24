@@ -5,10 +5,11 @@ import { LyricStage, PhraseList } from '../features/lyrics'
 import { RecordControls } from '../features/capture'
 import { PitchPanel } from '../features/pitch'
 import { ReviewPanel } from '../features/review'
+import { CalibrationPanel } from '../features/calibration'
 import { useWorkspace } from './useWorkspace'
 
 const {
-  transport, lyrics, pitch, review, capture, graphRange, graphPosition,
+  transport, lyrics, pitch, review, capture, calibration, graphRange, graphPosition, alignedLive,
   selectLine, adjacent, selectSong, seek, toggleLoop, togglePlay, toggleRecording, listen,
 } = useWorkspace()
 </script>
@@ -24,6 +25,16 @@ const {
     <aside class="left-rail">
       <SongCatalog :songs="songs" :current="transport.song.value" @select="selectSong" />
       <PhraseList :lines="transport.song.value.lines" :selected="lyrics.selected.value" :active="lyrics.active.value" @select="selectLine" />
+      <CalibrationPanel class="rail-calibration"
+        :phase="calibration.phase.value" :status="calibration.status.value" :issue="calibration.issue.value"
+        :level="calibration.level.value" :session="calibration.session.value" :retained="calibration.retained.value"
+        :records="calibration.records.value" :reverify="calibration.reverify.value"
+        :output-devices="calibration.outputDevices.value" :chosen-output-id="calibration.chosenOutputId.value"
+        @run="calibration.runTest" @abort="calibration.abortTest" @discard="calibration.discardSession"
+        @audition="calibration.audition" @audition-candidate="calibration.auditionCandidate"
+        @stop-audition="calibration.stopAudition" @mark="calibration.markManual"
+        @confirm-output="calibration.confirmOutputPath" @confirm-auto="calibration.confirmAuto"
+        @confirm-manual="calibration.confirmManual" @reverify="calibration.reVerify" />
     </aside>
     <div class="workbench">
       <SongHeading :song="transport.song.value" />
@@ -31,7 +42,7 @@ const {
         :playing="transport.isPlaying.value" :progress="lyrics.lineProgress.value" />
       <PitchPanel :notes="transport.song.value.notes" :position="graphPosition" :range="graphRange"
         :latest="capture.status.value === 'recording' ? pitch.latest.value : null"
-        :live="capture.status.value === 'recording' ? pitch.points.value : []"
+        :live="capture.status.value === 'recording' ? alignedLive : []"
         :take-a="review.slots.value[0]?.pitch ?? []" :take-b="review.slots.value[1]?.pitch ?? []" />
       <TransportBar :song="transport.song.value" :position="transport.position.value" :playing="transport.isPlaying.value"
         :loop="transport.loop.value" :volume="transport.volume.value" :issue="transport.issue.value"

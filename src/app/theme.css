@@ -236,3 +236,65 @@ input[type=range]::-moz-range-thumb { border: none; background: var(--gold); wid
 @media (prefers-reduced-motion: reduce) {
   button, select { transition: none; }
 }
+
+/* ===== 延迟校准 ===== */
+.rail-calibration { margin-top: 30px; border-top: 1px solid var(--rule); padding-top: 14px; }
+.calibration { display: grid; gap: 10px; font-size: 12px; }
+.cal-current { display: grid; gap: 10px; }
+.cal-value { font-size: 24px; color: var(--green); display: flex; align-items: baseline; gap: 7px; }
+.cal-value small { font-size: 10px; color: var(--muted); }
+.cal-hint { color: var(--muted); font-size: 11px; line-height: 1.5; }
+.cal-warn { display: flex; gap: 6px; align-items: flex-start; color: var(--gold); font-size: 11px; line-height: 1.5; }
+.cal-warn svg { margin-top: 2px; flex-shrink: 0; }
+.primary-button, .ghost-button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  min-height: 38px; padding: 0 12px; border-radius: 5px; font-size: 12px; white-space: nowrap;
+}
+.primary-button { background: var(--gold); color: #241e12; border: 1px solid transparent; font-weight: 700; }
+.primary-button:hover:not(:disabled) { background: #fad48d; }
+.ghost-button { background: #272b22; border: 1px solid #575648; color: var(--paper); }
+.ghost-button:hover:not(:disabled) { background: #3a3d30; }
+.ghost-button.tiny { min-height: 28px; padding: 0 8px; font-size: 11px; }
+.output-select { display: grid; gap: 5px; color: var(--muted); font-size: 11px; }
+.output-select select {
+  min-height: 38px; padding: 0 6px; border: 1px solid var(--rule);
+  border-radius: 4px; background: var(--inset); color: var(--paper); width: 100%;
+}
+.cal-testing { display: grid; gap: 9px; }
+.cal-testing .level-meter { margin-right: 0; }
+.cal-review { display: grid; gap: 10px; }
+.cal-device { font-size: 10px; color: var(--muted); line-height: 1.5; word-break: break-all; }
+.cal-canvas-wrap { display: grid; gap: 6px; }
+.cal-canvas { display: block; width: 100%; height: 150px; background: #1c2018; border: 1px solid var(--rule); border-radius: 5px; }
+.candidate-list { display: grid; gap: 4px; }
+.candidate-row {
+  display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center;
+  width: 100%; text-align: left; padding: 6px 8px; border: 1px solid var(--rule);
+  border-radius: 4px; background: var(--inset); color: inherit;
+}
+.candidate-row:hover { border-color: #5d7d83; background: #283032; }
+.candidate-row.chosen { border-color: #5d7d83; background: #263234; }
+.candidate-row strong { font-size: 12px; color: #85cbd5; }
+.candidate-row span { font-size: 11px; }
+.candidate-row small { color: var(--soft); font-size: 9px; }
+.cal-verdict { display: flex; gap: 8px; align-items: flex-start; padding: 8px 10px; border-radius: 5px; font-size: 11px; line-height: 1.55; }
+.cal-verdict p { margin: 0; }
+.cal-verdict.ok { background: #26311f; color: var(--green); }
+.cal-verdict.warn { background: #382d1d; color: var(--gold); }
+.cal-manual { font-size: 11px; color: var(--green); }
+.cal-actions { display: flex; flex-wrap: wrap; gap: 7px; }
+.cal-history { border-top: 1px solid var(--rule); padding-top: 10px; }
+.cal-history summary { cursor: pointer; color: var(--muted); font-size: 11px; display: flex; gap: 7px; align-items: center; }
+.cal-history ul { margin-top: 9px; display: grid; gap: 8px; max-height: 230px; overflow: auto; }
+.cal-history li { display: grid; grid-template-columns: 1fr auto; gap: 6px; align-items: center; border-bottom: 1px solid var(--rule); padding-bottom: 7px; }
+.cal-history li strong { font-size: 12px; margin-right: 7px; }
+.cal-history li small { display: block; color: var(--soft); font-size: 9px; line-height: 1.5; word-break: break-all; }
+.reverify-note { grid-column: 1 / -1; }
+.reverify-note.fail { color: var(--coral); }
+
+/* ===== 录音校准徽章 ===== */
+.cal-badge { display: inline-flex; align-items: center; gap: 4px; margin-top: 3px; }
+.cal-badge.ok { color: var(--green); }
+.cal-badge.warn { color: var(--gold); }
+.cal-badge.muted { color: var(--soft); }
+

@@ -1,8 +1,16 @@
 import { computed, onBeforeUnmount, onMounted, ref, shallowRef, watch, type Ref } from 'vue'
 import type { LyricLine, Song, Take } from '../../../shared/document'
 import { readTakes, writeTake } from '../lib/archive'
+import type { useCalibration } from '../../calibration'
 
-export function useReview(song: Ref<Song>, line: Ref<LyricLine | null>, beforeListen: () => void) {
+type CalibrationApi = Pick<ReturnType<typeof useCalibration>, 'alignTime'>
+
+export function useReview(
+  song: Ref<Song>,
+  line: Ref<LyricLine | null>,
+  beforeListen: () => void,
+  calibration?: CalibrationApi,
+) {
   const takes = shallowRef<Take[]>([])
   const ids = ref<[string | null, string | null]>([null, null])
   const playingId = ref<string | null>(null)
@@ -31,7 +39,9 @@ export function useReview(song: Ref<Song>, line: Ref<LyricLine | null>, beforeLi
 
   function tick() {
     if (!current || player.paused) return
-    position.value = Math.min(current.end, current.start + player.currentTime)
+    // 试听位置按该录音保存时的校准偏移映射回歌曲时间轴，与曲线使用同一偏移
+    const raw = current.start + player.currentTime
+    position.value = Math.min(current.end, calibration?.alignTime(raw, current.calibration) ?? raw)
     frame = requestAnimationFrame(tick)
   }
 

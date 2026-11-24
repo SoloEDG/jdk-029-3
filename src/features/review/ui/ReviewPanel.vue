@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AudioLines, GitCompareArrows, Headphones, Play, Square } from '@lucide/vue'
+import { AudioLines, BadgeCheck, GitCompareArrows, Headphones, Play, Square, TriangleAlert } from '@lucide/vue'
 import type { GuideNote, LyricLine, Take } from '../../../shared/document'
 import { clockLabel } from '../../../shared/time'
 import { accuracy } from '../lib/summary'
@@ -21,7 +21,17 @@ const slotIndices = [0, 1] as const
           <Square v-if="activeId === take.id" :size="13" fill="currentColor" /><Play v-else :size="13" fill="currentColor" />
         </button>
         <div class="take-info"><strong>录音 {{ takes.length - index }}</strong>
-          <small class="mono">{{ clockLabel(take.start, true) }}–{{ clockLabel(take.end, true) }}</small></div>
+          <small class="mono">{{ clockLabel(take.start, true) }}–{{ clockLabel(take.end, true) }}</small>
+          <small v-if="take.calibration?.calibrated" class="cal-badge ok" :title="`按录音时刻的校准偏移 ${take.calibration.latencyMs}ms 对齐`">
+            <BadgeCheck :size="11" /> 已校准 {{ take.calibration.latencyMs }}ms
+          </small>
+          <small v-else-if="take.calibration && !take.calibration.calibrated" class="cal-badge warn" title="录音时刻输出路径未知，曲线未做延迟对齐">
+            <TriangleAlert :size="11" /> 输出未知未对齐
+          </small>
+          <small v-else class="cal-badge muted" title="该录音产生于校准功能上线前，按零偏移（当时的校准）解释">
+            旧录音 · 未校准
+          </small>
+        </div>
         <span class="mono take-score" title="检测到的音高中命中参考音的占比">{{ accuracy(take, notes) ?? '—' }}<template v-if="accuracy(take, notes) !== null">%</template></span>
       </li>
     </ol>

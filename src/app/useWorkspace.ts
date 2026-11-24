@@ -4,6 +4,7 @@ import { useLyrics } from '../features/lyrics'
 import { useCapture } from '../features/capture'
 import { usePitch } from '../features/pitch'
 import { useReview } from '../features/review'
+import { useCalibration } from '../features/calibration'
 import type { Song, Take } from '../shared/document'
 
 export function useWorkspace() {
@@ -12,16 +13,23 @@ export function useWorkspace() {
   })
   const lyrics = useLyrics(transport.song, transport.position)
   const pitch = usePitch()
+  const calibration = useCalibration()
   const review = useReview(transport.song, lyrics.selected, () => {
     capture.cancelRequest()
     transport.pause()
-  })
+  }, calibration)
   const capture = useCapture({
     onFrame: pitch.receive,
     position: transport.read,
     onComplete: async result => {
+      const info = calibration.infoForCapture()
       await review.save({
-        ...result, id: crypto.randomUUID(), createdAt: Date.now(), pitch: pitch.slice(result),
+        ...result, id: crypto.randomUUID(), createdAt: Date.now(),
+        pitch: pitch.slice(result).map(point => ({
+          ...point,
+          time: calibration.alignTime(point.time, info),
+        })),
+        calibration: info,
       })
     },
   })
@@ -32,6 +40,11 @@ export function useWorkspace() {
     return lyrics.active.value ?? lyrics.upcoming.value ?? lyrics.selected.value!
   })
   const graphPosition = computed(() => review.position.value ?? transport.position.value)
+  // 实时曲线与已保存曲线共用同一校准偏移，避免录音中与回放后看起来错位
+  const alignedLive = computed(() => {
+    const info = calibration.infoForCapture()
+    return pitch.points.value.map(point => ({ ...point, time: calibration.alignTime(point.time, info) }))
+  })
 
   function finishCapture(position: number): void { void capture.stop(position) }
 
@@ -115,11 +128,14 @@ export function useWorkspace() {
     capture.cancelRequest()
     transport.pause()
   }
-  onMounted(() => document.addEventListener('visibilitychange', handleVisibility))
+  onMounted(() => {
+    document.addEventListener('visibilitychange', handleVisibility)
+    void calibration.load()
+  })
   onBeforeUnmount(() => document.removeEventListener('visibilitychange', handleVisibility))
 
   return {
-    transport, lyrics, pitch, review, capture, graphRange, graphPosition,
+    transport, lyrics, pitch, review, capture, calibration, graphRange, graphPosition, alignedLive,
     selectLine, adjacent, selectSong, seek, toggleLoop, togglePlay, toggleRecording, listen,
   }
 }
